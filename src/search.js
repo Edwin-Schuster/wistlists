@@ -24,7 +24,7 @@ async function searchProducts(query) {
   if (hit && Date.now() - hit.at < 6 * 3600e3) return { provider: 'google_shopping', results: hit.results, storeLinks };
 
   const params = new URLSearchParams({
-    engine: 'google_shopping',
+    engine: config.SERPAPI_ENGINE,
     q,
     gl: config.SEARCH_COUNTRY,
     hl: 'en',
