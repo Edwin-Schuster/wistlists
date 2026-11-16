@@ -1,0 +1,164 @@
+/* ===================================================================
+   Stage 3 extras: ornament tree, candy cane progress, elf wheel, scroll
+   =================================================================== */
+
+/* ---------- ornament tree in the hero ---------- */
+.hero-tree {
+  position: absolute; z-index: 3; left: max(10px, calc(50% - 600px)); bottom: 6px; width: 92px;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+}
+@media (min-width: 760px) { .hero-tree { width: 132px; left: max(24px, calc(50% - 560px)); bottom: 4px; } }
+.xtree { width: 100%; height: auto; display: block; overflow: visible; }
+.xtree .tree-star { fill: #c9a24a; transition: fill 0.4s; }
+.xtree .star-glow { opacity: 0; transition: opacity 0.6s; }
+.xtree.complete .tree-star { fill: #ffe066; }
+.xtree.complete .star-glow { opacity: 1; animation: starPulse 2s ease-in-out infinite; }
+@keyframes starPulse { 50% { opacity: 0.55; } }
+.xtree .orn { animation: ornSwing 3.5s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.3s); }
+.xtree .orn:nth-child(3n) { animation-duration: 4.2s; }
+.xtree .orn-new { animation: ornDrop 0.9s cubic-bezier(0.3, 1.5, 0.5, 1) both, ornSwing 3.5s 0.9s ease-in-out infinite; }
+@keyframes ornSwing { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@keyframes ornDrop {
+  0% { transform: translateY(-50px) scale(0.6); opacity: 0; }
+  60% { transform: translateY(3px) scale(1.15); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.xtree-more {
+  position: absolute; right: -4px; top: 30%; background: #fffdf8; color: var(--cranberry); font-weight: 900;
+  font-size: 0.75rem; padding: 1px 6px; border-radius: 999px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.hero-tree-caption {
+  position: absolute; left: 50%; bottom: -2px; transform: translate(-50%, 100%); white-space: nowrap;
+  font-size: 0.7rem; font-weight: 800; color: #0f3d2e; background: rgba(255, 253, 248, 0.85); padding: 1px 7px; border-radius: 999px;
+}
+
+/* ---------- candy-cane progress bar ---------- */
+.cane-box { margin: 22px 0 6px; }
+.cane { display: flex; align-items: flex-end; gap: 0; }
+.cane-hook { width: 30px; height: 36px; flex: none; margin-right: -9px; position: relative; z-index: 1; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.18)); }
+.cane-track {
+  flex: 1; height: 18px; border-radius: 0 999px 999px 0; background: #f3ede1; overflow: hidden; position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+.cane-fill {
+  height: 100%; border-radius: 0 999px 999px 0; width: 0; transition: width 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.08)),
+    repeating-linear-gradient(-45deg, #c4202b 0 10px, #fff 10px 20px);
+  background-size: 100% 100%, 28.28px 28.28px;
+  animation: caneSlide 1.2s linear infinite;
+}
+@keyframes caneSlide { to { background-position: 0 0, 28.28px 0; } }
+.cane-msg { margin: 8px 0 0; font-weight: 700; color: var(--heading); text-align: center; }
+.cane-msg strong { color: var(--cranberry); font-size: 1.1em; }
+html[data-theme='fireplace'] .cane-track { background: #24160d; }
+html[data-theme='fireplace'] .cane-msg strong { color: #ff9d8f; }
+.stocking .mini-cane { display: block; margin: 6px auto 0; width: 140px; }
+.stocking .mini-cane .cane-hook { width: 20px; height: 24px; margin-right: -6px; }
+.stocking .mini-cane .cane-track { height: 11px; }
+.stocking .mini-cane-label { display: block; font-size: 0.8rem; font-weight: 800; color: var(--muted); margin-top: 2px; }
+
+/* ---------- list toolbar for extras ---------- */
+.fun-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 14px 0 0; }
+
+/* ---------- elf wheel ---------- */
+.elf-dialog { max-width: min(94vw, 460px); width: 100%; text-align: center; }
+.wheel-wrap { position: relative; width: min(78vw, 320px); margin: 6px auto 4px; }
+.wheel-svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25)); }
+.wheel-svg text { font-family: var(--font-body); font-weight: 800; }
+.wheel-rot { transform-box: view-box; transform-origin: 150px 150px; }
+.wheel-pointer {
+  position: absolute; left: 50%; top: -6px; z-index: 2; width: 26px; height: 34px; margin-left: -13px;
+  background: var(--cranberry); clip-path: polygon(50% 100%, 0 0, 100% 0); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+}
+.wheel-pointer::after { content: ''; position: absolute; left: 8px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #e8bd45; }
+.elf-result:empty { display: none; }
+.elf-pick { display: flex; gap: 12px; align-items: center; text-align: left; background: var(--note-bg); border-radius: 14px; padding: 10px; margin-top: 10px; animation: fadeIn 0.4s ease both; }
+.elf-pick img, .elf-pick .ph { width: 72px; height: 72px; border-radius: 10px; object-fit: contain; background: #fff; flex: none; display: grid; place-items: center; font-size: 2rem; }
+.elf-pick strong { display: block; line-height: 1.3; }
+
+/* ===================================================================
+   Santa's scroll (printable)
+   =================================================================== */
+.scroll-page { padding: 34px 12px 70px; }
+.scroll-tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 26px; align-items: center; }
+.scroll-tools label { display: inline-flex; gap: 6px; align-items: center; margin: 0; font-weight: 700; }
+.scroll-tools input { width: 20px; height: 20px; }
+.scroll { position: relative; max-width: 720px; margin: 0 auto; }
+.scroll-rod {
+  position: relative; z-index: 2; height: 34px; margin: 0 -18px; border-radius: 17px;
+  background: linear-gradient(180deg, #f3e2b8 0%, #e3c78c 35%, #c9a25c 70%, #a8813f 100%);
+  box-shadow: 0 6px 12px rgba(70, 45, 10, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.5);
+}
+.scroll-rod::before, .scroll-rod::after { /* wooden knobs */
+  content: ''; position: absolute; top: 3px; width: 30px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #a5633a, #6b3a1c 70%); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
+}
+.scroll-rod::before { left: -18px; }
+.scroll-rod::after { right: -18px; }
+.scroll-rod.top { margin-bottom: -14px; }
+.scroll-rod.bottom { margin-top: -14px; }
+.parchment {
+  position: relative; z-index: 1; color: #3b2a14; padding: 46px clamp(20px, 6vw, 64px) 40px;
+  background-color: #f4e4c1;
+  background-image:
+    var(--paper-texture),
+    radial-gradient(ellipse at 50% 40%, rgba(255, 250, 235, 0.9), transparent 70%),
+    radial-gradient(ellipse at 0 50%, rgba(160, 110, 40, 0.28), transparent 18%),
+    radial-gradient(ellipse at 100% 50%, rgba(160, 110, 40, 0.28), transparent 18%),
+    linear-gradient(180deg, #ecd6a6, #f6e8c8 20%, #f6e8c8 80%, #ecd6a6);
+  box-shadow: inset 0 0 50px rgba(140, 95, 30, 0.35), 0 10px 30px rgba(60, 40, 10, 0.25);
+}
+.parchment h1 { text-align: center; color: #7a1a1f; font-size: clamp(2.6rem, 9vw, 3.8rem); margin: 0; }
+.parchment .scroll-sub { text-align: center; font-family: var(--font-swash); font-size: 1.35rem; color: #0f3d2e; margin: 2px 0 6px; }
+.parchment .scroll-intro { text-align: center; font-style: italic; margin: 0 auto 18px; max-width: 520px; color: #5b4322; }
+.scroll-divider { text-align: center; color: #a8813f; letter-spacing: 6px; margin: 4px 0 14px; }
+.scroll-list { list-style: none; padding: 0; margin: 0; counter-reset: wish; }
+.scroll-item {
+  counter-increment: wish; display: grid; grid-template-columns: 26px 1fr auto; gap: 4px 12px; align-items: start;
+  padding: 12px 0; border-bottom: 1px dashed rgba(122, 90, 40, 0.45); break-inside: avoid; page-break-inside: avoid;
+}
+.scroll-item:last-child { border-bottom: 0; }
+.scroll-box { width: 20px; height: 20px; border: 2px solid #6b4a1f; border-radius: 3px; margin-top: 4px; position: relative; }
+.scroll-item.is-claimed .scroll-box::after { content: '✓'; position: absolute; left: 2px; top: -6px; font-size: 1.3rem; color: #0f3d2e; font-weight: 900; }
+.scroll-title { font-family: var(--font-swash); font-size: 1.2rem; line-height: 1.25; color: #2d1e0b; }
+.scroll-title::before { content: counter(wish) '. '; color: #7a1a1f; }
+.scroll-meta { font-size: 0.92rem; color: #5b4322; }
+.scroll-meta .stars { color: #b8860b; }
+.scroll-note { font-style: italic; font-size: 0.9rem; color: #5b4322; }
+.scroll-price { font-weight: 900; color: #7a1a1f; white-space: nowrap; font-size: 1.05rem; }
+.scroll-link { font-size: 0.78rem; color: #7a5a28; overflow-wrap: anywhere; }
+.scroll-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 26px; flex-wrap: wrap; }
+.scroll-total { font-family: var(--font-swash); font-size: 1.1rem; color: #0f3d2e; }
+.scroll-sign { font-family: var(--font-display); font-size: 1.6rem; color: #7a1a1f; font-weight: 700; }
+.wax-seal {
+  width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center; font-size: 1.9rem; flex: none;
+  background: radial-gradient(circle at 35% 30%, #d84a52, #9e1b24 60%, #6e0f16);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35), inset 0 0 0 6px rgba(0, 0, 0, 0.12), inset 0 0 0 9px rgba(255, 255, 255, 0.08);
+  clip-path: polygon(50% 0, 61% 6%, 75% 4%, 82% 15%, 95% 21%, 94% 36%, 100% 50%, 94% 64%, 96% 78%, 83% 85%, 76% 97%, 61% 94%, 50% 100%, 39% 94%, 24% 96%, 17% 85%, 5% 79%, 6% 64%, 0 50%, 6% 36%, 4% 21%, 17% 15%, 24% 4%, 39% 6%);
+}
+.scroll-url { text-align: center; font-size: 0.85rem; color: #5b4322; margin-top: 18px; }
+
+@media print {
+  @page { margin: 12mm; }
+  html, body { background: #fff !important; }
+  body::before { display: none !important; }
+  .topbar, .dock, .snow-canvas, .fx-canvas, .scroll-tools, .toasts, .sleigh, footer.site { display: none !important; }
+  .scroll-page { padding: 0; }
+  .scroll { max-width: none; }
+  .scroll-rod { margin: 0 6px; }
+  .parchment, .scroll-rod, .wax-seal { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .parchment { box-shadow: inset 0 0 40px rgba(140, 95, 30, 0.3); padding: 26px 40px 22px; }
+  .parchment h1 { font-size: 2.8rem; }
+  .scroll-item { padding: 7px 0; }
+  .scroll-foot { margin-top: 14px; }
+  .scroll-url { margin-top: 10px; }
+  .scroll-rod.top { margin-bottom: -10px; }
+  .scroll-rod.bottom { margin-top: -10px; break-before: avoid; page-break-before: avoid; }
+  a { color: inherit !important; text-decoration: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xtree .orn, .xtree .orn-new, .xtree.complete .star-glow, .cane-fill { animation: none !important; }
+  .cane-fill { transition: none; }
+}

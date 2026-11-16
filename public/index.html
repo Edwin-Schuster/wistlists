@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f3d2e">
+<title>Our Christmas Wish Lists</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
+<link rel="preload" href="/static/fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/mountains-of-christmas-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/festive.css">
+<link rel="stylesheet" href="/static/extras.css">
+<script>document.documentElement.dataset.theme = localStorage.getItem("wl_theme") || "classic";</script>
+</head>
+<body>
+<header class="topbar"><nav class="wrap" data-nav><a class="brand" href="/">🎄 <span>Wish Lists</span></a></nav></header>
+<section class="hero" data-sky>
+  <div class="wrap">
+    <h1>Our Christmas Wish Lists</h1>
+    <p class="hero-sub">Pick a stocking to peek inside. Claim a gift so nobody doubles up!</p>
+    <div class="countdown" data-countdown></div>
+  </div>
+</section>
+<main class="wrap">
+  <div class="mantel-wrap">
+    <div class="mantel" aria-hidden="true"></div>
+    <div class="stockings" id="stockings" aria-live="polite"><p class="muted">Loading…</p></div>
+  </div>
+</main>
+<footer class="site">Made with 🎄 and cocoa</footer>
+<script src="/static/common.js"></script>
+<script src="/static/festive.js"></script>
+<script src="/static/extras.js"></script>
+<script src="/static/home.js"></script>
+</body>
+</html>

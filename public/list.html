@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f3d2e">
+<title>{{TITLE}}</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
+<link rel="preload" href="/static/fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/mountains-of-christmas-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/festive.css">
+<link rel="stylesheet" href="/static/extras.css">
+<script>document.documentElement.dataset.theme = localStorage.getItem("wl_theme") || "classic";</script>
+<meta name="description" content="{{DESCRIPTION}}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:image" content="{{OG_IMAGE}}">
+<meta property="og:url" content="{{URL}}">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<header class="topbar"><nav class="wrap" data-nav><a class="brand" href="/">🎄 <span>Wish Lists</span></a></nav></header>
+<section class="hero" data-sky>
+  <div class="hero-tree" id="hero-tree" aria-live="polite"></div>
+  <div class="wrap">
+    <div class="avatar-big" id="owner-avatar">🎁</div>
+    <h1 id="list-title">Wish List</h1>
+    <p id="list-intro" class="hero-sub"></p>
+    <div class="list-stats" id="list-stats"></div>
+    <div class="share-row">
+      <button class="btn btn-gold btn-sm" type="button" id="copy-link">🔗 Copy link</button>
+      <button class="btn btn-light btn-sm hidden" type="button" id="share-link">📤 Share</button>
+      <button class="btn btn-red btn-sm hidden" type="button" id="elf-mode">🧝 Elf mode</button>
+      <a class="btn btn-light btn-sm" id="scroll-link" href="#">📜 Santa's scroll</a>
+    </div>
+    <div class="countdown" data-countdown></div>
+  </div>
+</section>
+<main class="wrap">
+  <div class="cane-box" id="cane"></div>
+  <div class="notice hidden" id="owner-notice">
+    🙈 This is your own list, so claims are hidden. No spoilers! <a href="/manage">Edit your list →</a>
+  </div>
+
+  <section id="stuffers-section" class="hidden">
+    <div class="section-head"><h2>🧦 Stocking stuffers under $25</h2></div>
+    <div class="scroller" id="stuffers"></div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>All wishes</h2><span class="muted small" id="result-count"></span></div>
+    <form class="panel filters" id="filters" role="search" onsubmit="return false">
+      <div class="f-search">
+        <label for="f-q">Search</label>
+        <input type="search" id="f-q" placeholder="Search this list…">
+      </div>
+      <div>
+        <label>Price</label>
+        <div class="price-range">
+          <input type="number" id="f-min" inputmode="decimal" min="0" placeholder="Min" aria-label="Minimum price">
+          <span>–</span>
+          <input type="number" id="f-max" inputmode="decimal" min="0" placeholder="Max" aria-label="Maximum price">
+        </div>
+      </div>
+      <div>
+        <label for="f-store">Store</label>
+        <select id="f-store"><option value="">All stores</option></select>
+      </div>
+      <div>
+        <label for="f-priority">Priority</label>
+        <select id="f-priority">
+          <option value="">Any</option>
+          <option value="3">★★★ Dream gift</option>
+          <option value="2">★★ Really want +</option>
+          <option value="1">★ Nice +</option>
+        </select>
+      </div>
+      <div>
+        <label for="f-sort">Sort</label>
+        <select id="f-sort">
+          <option value="featured">Their order</option>
+          <option value="priority">Priority</option>
+          <option value="price-asc">Price: low → high</option>
+          <option value="price-desc">Price: high → low</option>
+          <option value="newest">Newest</option>
+        </select>
+      </div>
+      <label class="f-check" id="f-unclaimed-wrap"><input type="checkbox" id="f-unclaimed"> Unclaimed only</label>
+    </form>
+    <div class="grid" id="grid" aria-live="polite"></div>
+  </section>
+</main>
+
+<dialog id="claim-dialog">
+  <form method="dialog" id="claim-form">
+    <h2>🎁 I'll get this!</h2>
+    <p id="claim-item-title" class="muted"></p>
+    <div class="field">
+      <label for="claim-name">Your name <span class="muted">(optional)</span></label>
+      <input type="text" id="claim-name" maxlength="60" placeholder="e.g. Aunt Linda" autocomplete="name">
+    </div>
+    <p class="small muted">The list owner won't see this. Everyone else will, so nobody buys it twice.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-light" value="cancel" type="submit" formnovalidate>Cancel</button>
+      <button class="btn btn-red" value="ok" type="submit">Claim it</button>
+    </div>
+  </form>
+</dialog>
+<footer class="site">Made with 🎄 and cocoa</footer>
+<script src="/static/common.js"></script>
+<script src="/static/festive.js"></script>
+<script src="/static/extras.js"></script>
+<script src="/static/list.js"></script>
+</body>
+</html>
