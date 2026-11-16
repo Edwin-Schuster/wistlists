@@ -16,6 +16,7 @@
     if (name === 'manual') openEditor({}, { warning: '' });
     if (name === 'search') $('search-q').focus();
     if (name === 'link') $('magic-url').focus();
+    if (name === 'import') $('import-url').focus();
   }
   tabs.forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
 
@@ -362,6 +363,113 @@
     toast('Drag me to your bookmarks bar!');
   });
   $('bookmarklet-code').value = code;
+
+  // ---------- import an Amazon wish list ----------
+  let imported = [];
+  const importOut = $('import-out');
+
+  function renderImport(r) {
+    imported = r.items;
+    const fresh = imported.filter((x) => !x.already).length;
+    if (!imported.length) {
+      importOut.innerHTML = `<p class="muted">"${esc(r.listName)}" has no items yet.</p>`;
+      return;
+    }
+    importOut.innerHTML = `
+      <div class="section-head" style="margin-top:14px;flex-wrap:wrap;gap:8px">
+        <div><strong>${esc(r.listName)}</strong> <span class="muted small">${imported.length} item${imported.length === 1 ? '' : 's'}${
+          fresh < imported.length ? `, ${imported.length - fresh} already on your list` : ''
+        }</span></div>
+        <label class="small"><input type="checkbox" id="import-all" ${fresh ? 'checked' : ''}> Select all new</label>
+      </div>
+      <div class="results" id="import-results">
+        ${imported
+          .map(
+            (x, idx) => `
+          <label class="result" style="cursor:pointer;${x.already ? 'opacity:.55' : ''}">
+            ${safeUrl(x.image) ? `<img src="${esc(safeUrl(x.image))}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}
+            <div class="r-body">
+              <div class="r-title">${esc(x.title)}</div>
+              <div><span class="price" style="font-size:1rem">${x.price != null ? esc(money(x.price, x.currency || cfg.currency)) : '<span class="muted small">No price</span>'}</span>
+                ${x.quantity > 1 ? `<span class="small muted">× ${x.quantity}</span>` : ''}</div>
+              ${x.notes ? `<div class="small muted">“${esc(x.notes)}”</div>` : ''}
+              <div class="small" style="margin-top:auto">
+                <input type="checkbox" data-import-idx="${idx}" ${x.already ? '' : 'checked'}> ${x.already ? 'Already on your list' : 'Import'}
+              </div>
+            </div>
+          </label>`
+          )
+          .join('')}
+      </div>
+      <p style="margin-top:14px"><button class="btn btn-red" id="import-go" type="button"></button> <span class="small muted" id="import-progress"></span></p>`;
+    updateImportButton();
+  }
+
+  const checkedImports = () => [...importOut.querySelectorAll('[data-import-idx]:checked')].map((c) => imported[Number(c.dataset.importIdx)]);
+  function updateImportButton() {
+    const n = checkedImports().length;
+    const b = $('import-go');
+    if (!b) return;
+    b.textContent = `🎁 Add ${n} item${n === 1 ? '' : 's'} to my list`;
+    b.disabled = n === 0;
+  }
+
+  importOut.addEventListener('change', (e) => {
+    if (e.target.id === 'import-all') {
+      importOut.querySelectorAll('[data-import-idx]').forEach((c) => {
+        if (!imported[Number(c.dataset.importIdx)].already) c.checked = e.target.checked;
+      });
+    }
+    updateImportButton();
+  });
+
+  $('import-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('import-btn');
+    btn.disabled = true;
+    importOut.innerHTML = '<p class="muted">Reading your Amazon list… long lists can take up to a minute.</p>';
+    try {
+      renderImport(await api('POST', '/api/import/amazon/preview', { url: $('import-url').value.trim() }));
+    } catch (ex) {
+      importOut.innerHTML = `<p class="small" style="color:var(--cranberry)">⚠️ ${esc(ex.message)}</p>`;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  importOut.addEventListener('click', async (e) => {
+    if (e.target.id !== 'import-go') return;
+    const picked = checkedImports().map(({ already, ...it }) => it);
+    if (!picked.length) return;
+    const go = e.target;
+    go.disabled = true;
+    const progress = $('import-progress');
+    // Send the last batch first: each batch lands on top, so the list ends up in Amazon's order.
+    const batches = [];
+    for (let i = 0; i < picked.length; i += 10) batches.push(picked.slice(i, i + 10));
+    let added = 0;
+    let skipped = 0;
+    let done = 0;
+    try {
+      for (const batch of batches.reverse()) {
+        progress.textContent = `Adding… ${done} of ${picked.length}`;
+        const r = await api('POST', '/api/import/items', { items: batch });
+        added += r.added;
+        skipped += r.skipped;
+        done += batch.length;
+      }
+      progress.textContent = '';
+      toast(`🎁 Added ${added} item${added === 1 ? '' : 's'}${skipped ? ` (${skipped} skipped, already on your list)` : ''}`);
+      importOut.innerHTML = '';
+      $('import-url').value = '';
+      await loadItems();
+    } catch (ex) {
+      progress.textContent = '';
+      toast(`${ex.message}${added ? ` (${added} added before the error)` : ''}`, 'error');
+      if (added) await loadItems();
+      go.disabled = false;
+    }
+  });
 
   await loadItems();
 
