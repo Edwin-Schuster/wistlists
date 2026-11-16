@@ -14,6 +14,8 @@ module.exports = {
   SESSION_DAYS: Number(process.env.SESSION_DAYS || 30),
   // Optional: https://serpapi.com key enables in-app Google Shopping search with prices + photos.
   SERPAPI_KEY: process.env.SERPAPI_KEY || '',
+  // SerpApi engine. google_shopping currently returns no results; google_shopping_light works and has the same fields.
+  SERPAPI_ENGINE: process.env.SERPAPI_ENGINE || 'google_shopping_light',
   SEARCH_COUNTRY: process.env.SEARCH_COUNTRY || 'us',
   DEFAULT_CURRENCY: process.env.DEFAULT_CURRENCY || 'USD',
   // "username:Display Name:password;username2:Display Name 2:password2"

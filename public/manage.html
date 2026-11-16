@@ -25,6 +25,7 @@
       <button role="tab" aria-selected="true" data-tab="link">✨ Paste a link</button>
       <button role="tab" aria-selected="false" data-tab="search">🔍 Search</button>
       <button role="tab" aria-selected="false" data-tab="manual">✏️ Add by hand</button>
+      <button role="tab" aria-selected="false" data-tab="import">📥 Import Amazon list</button>
     </div>
 
     <div data-pane="link">
@@ -49,6 +50,18 @@
 
     <div data-pane="manual" class="hidden">
       <p class="small muted" style="margin-top:0">Something not sold online, or want to use your own photo? Fill it in here.</p>
+    </div>
+
+    <div data-pane="import" class="hidden">
+      <form class="inline-form" id="import-form">
+        <input type="url" id="import-url" inputmode="url" placeholder="Paste your Amazon wish list link" aria-label="Amazon wish list link" required>
+        <button class="btn btn-red" type="submit" id="import-btn">📥 Find items</button>
+      </form>
+      <p class="small muted" style="margin:8px 0 0">
+        On Amazon, open your list and use <strong>Send list to others → Copy link</strong>. The list must be set to <strong>Public</strong> or <strong>Shared</strong>.
+        Importing again later only adds the new items.
+      </p>
+      <div id="import-out"></div>
     </div>
 
     <div id="editor-slot"></div>

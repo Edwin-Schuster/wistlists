@@ -5,7 +5,8 @@ const express = require('express');
 const config = require('./config');
 const db = require('./db');
 const auth = require('./auth');
-const { scrapeProduct, cacheImage } = require('./scraper');
+const { scrapeProduct, cacheImage, canonicalizeUrl } = require('./scraper');
+const { fetchAmazonWishlist } = require('./amazon-wishlist');
 const search = require('./search');
 
 auth.seedUsers();
@@ -395,6 +396,78 @@ api.post(
     if (!item.url) throw httpError(400, 'This item has no link to refresh from');
     const r = await refreshItem(item);
     res.json({ item: serializeItem(getItem(item.id), null), ...r });
+  })
+);
+
+// ----- import an Amazon wish list -----
+// Key used to spot items that are already on the user's list (any status).
+const dupKey = (url) => (url ? canonicalizeUrl(url).replace(/^http:/, 'https:').replace(/\/+$/, '').toLowerCase() : '');
+
+api.post(
+  '/import/amazon/preview',
+  auth.requireUser,
+  auth.rateLimit({ max: 10, windowMs: 10 * 60e3, message: 'Too many imports in a row. Try again in a few minutes.' }),
+  wrap(async (req, res) => {
+    const list = await fetchAmazonWishlist(req.body?.url);
+    const existing = new Set(
+      db.prepare("SELECT url FROM items WHERE user_id = ? AND url <> ''").all(req.user.id).map((r) => dupKey(r.url))
+    );
+    res.json({ ...list, items: list.items.map((it) => ({ ...it, already: Boolean(it.url && existing.has(dupKey(it.url))) })) });
+  })
+);
+
+// Saves a batch of previewed items (the page sends them in small batches to show progress).
+api.post(
+  '/import/items',
+  auth.requireUser,
+  wrap(async (req, res) => {
+    const input = Array.isArray(req.body?.items) ? req.body.items.slice(0, 50) : [];
+    if (!input.length) throw httpError(400, 'Pick at least one item to import');
+    const existing = new Set(
+      db.prepare("SELECT url FROM items WHERE user_id = ? AND url <> ''").all(req.user.id).map((r) => dupKey(r.url))
+    );
+    const rows = [];
+    let skipped = 0;
+    for (const raw of input) {
+      let data;
+      try {
+        data = cleanItemInput(raw || {});
+      } catch {
+        skipped++;
+        continue;
+      }
+      const key = dupKey(data.url);
+      if (key && existing.has(key)) {
+        skipped++;
+        continue;
+      }
+      if (key) existing.add(key);
+      rows.push(data);
+    }
+    // Download photos a few at a time so the batch finishes quickly.
+    const queue = [...rows];
+    const worker = async () => {
+      for (let d = queue.shift(); d; d = queue.shift()) d.image = await resolveImage(d.image);
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
+
+    // Keep the batch in its original order, above everything already on the list.
+    const top = db.prepare('SELECT COALESCE(MIN(sort_order), 0) AS s FROM items WHERE user_id = ?').get(req.user.id).s;
+    const insert = db.prepare(
+      `INSERT INTO items (user_id, title, url, store, price, currency, image, notes, priority, quantity, sort_order)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    );
+    db.exec('BEGIN');
+    try {
+      rows.forEach((d, i) =>
+        insert.run(req.user.id, d.title, d.url, d.store, d.price, d.currency, d.image, d.notes, d.priority, d.quantity, top - rows.length + i)
+      );
+      db.exec('COMMIT');
+    } catch (e) {
+      db.exec('ROLLBACK');
+      throw e;
+    }
+    res.json({ added: rows.length, skipped });
   })
 );
 

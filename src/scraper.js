@@ -398,4 +398,4 @@ async function cacheImage(imageUrl) {
   }
 }
 
-module.exports = { scrapeProduct, cacheImage, parsePrice, extract, canonicalizeUrl, storeFromHost };
+module.exports = { scrapeProduct, cacheImage, parsePrice, extract, canonicalizeUrl, storeFromHost, safeFetch, currencyFromText };
